@@ -1,0 +1,37 @@
+# DS 410 Final Project - UFC Sell-Through Prediction
+# Install with: pip install -r requirements.txt
+
+# Spark (for big data processing)
+pyspark>=3.4.0
+
+# GraphFrames (for graph analytics)
+# Also need: --packages graphframes:graphframes:0.8.4-spark3.5-s_2.13 with spark-submit
+graphframes>=0.6
+
+# Data manipulation
+pandas>=2.0.0
+numpy>=1.24.0
+
+# File format
+pyarrow>=12.0.0
+
+# Web scraping (for attendance data)
+beautifulsoup4>=4.12.0
+requests>=2.31.0
+lxml>=4.9.0
+
+# Google Trends API
+pytrends>=4.9.0
+
+# Reddit API
+praw>=7.7.0
+
+# Sentiment Analysis
+textblob>=0.17.0
+
+# Plotting (optional, for visualizations)
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Environment variables
+python-dotenv>=1.0.0

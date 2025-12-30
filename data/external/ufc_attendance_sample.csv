@@ -1,0 +1,108 @@
+event_name,event_date,venue,location,attendance,gate_revenue,venue_capacity,sell_through,ppv_buys,source
+UFC 306,2024-09-14,Sphere,Paradise Nevada,16000,21829245,17500,0.914,,Wikipedia
+UFC 305,2024-08-18,RAC Arena,Perth Australia,14212,6501177,15500,0.917,,Wikipedia
+UFC 304,2024-07-27,Co-op Live,Manchester England,21042,7500000,23500,0.895,,Wikipedia
+UFC 303,2024-06-29,T-Mobile Arena,Las Vegas Nevada,19731,17900000,20000,0.987,,Wikipedia
+UFC 302,2024-06-01,Prudential Center,Newark New Jersey,15913,8500000,18000,0.884,,Wikipedia
+UFC 301,2024-05-04,Farmasi Arena,Rio de Janeiro Brazil,14186,3000000,16000,0.887,,Wikipedia
+UFC 300,2024-04-13,T-Mobile Arena,Las Vegas Nevada,20067,16500000,20000,1.003,,Wikipedia
+UFC 299,2024-03-09,Kaseya Center,Miami Florida,19042,13500000,20000,0.952,,Wikipedia
+UFC 298,2024-02-17,Honda Center,Anaheim California,17192,5800000,18000,0.955,,Wikipedia
+UFC 297,2024-01-20,Scotiabank Arena,Toronto Canada,19423,7800000,20000,0.971,,Wikipedia
+UFC 296,2023-12-16,T-Mobile Arena,Las Vegas Nevada,18994,12500000,20000,0.950,,Wikipedia
+UFC 295,2023-11-11,Madison Square Garden,New York New York,20715,13500000,20000,1.036,,Wikipedia
+UFC 294,2023-10-21,Etihad Arena,Abu Dhabi UAE,12000,4000000,12000,1.000,,Wikipedia
+UFC 293,2023-09-10,Qudos Bank Arena,Sydney Australia,15621,8300000,18000,0.868,,Wikipedia
+UFC 292,2023-08-19,TD Garden,Boston Massachusetts,17426,9400000,18000,0.968,,Wikipedia
+UFC 291,2023-07-29,Delta Center,Salt Lake City Utah,16000,7200000,18000,0.889,,Wikipedia
+UFC 290,2023-07-08,T-Mobile Arena,Las Vegas Nevada,20022,14200000,20000,1.001,,Wikipedia
+UFC 289,2023-06-10,Rogers Arena,Vancouver Canada,18439,8900000,19000,0.970,,Wikipedia
+UFC 288,2023-05-06,Prudential Center,Newark New Jersey,15312,6800000,18000,0.851,,Wikipedia
+UFC 287,2023-04-08,Kaseya Center,Miami Florida,19201,11900000,20000,0.960,,Wikipedia
+UFC 286,2023-03-18,O2 Arena,London England,19618,8500000,20000,0.981,,Wikipedia
+UFC 285,2023-03-04,T-Mobile Arena,Las Vegas Nevada,19721,14200000,20000,0.986,,Wikipedia
+UFC 284,2023-02-12,RAC Arena,Perth Australia,14107,9200000,15500,0.910,,Wikipedia
+UFC 283,2023-01-21,Jeunesse Arena,Rio de Janeiro Brazil,15000,3500000,16000,0.938,,Wikipedia
+UFC 282,2022-12-10,T-Mobile Arena,Las Vegas Nevada,17816,6800000,20000,0.891,,Wikipedia
+UFC 281,2022-11-12,Madison Square Garden,New York New York,20821,12300000,20000,1.041,,Wikipedia
+UFC 280,2022-10-22,Etihad Arena,Abu Dhabi UAE,12000,4500000,12000,1.000,,Wikipedia
+UFC 279,2022-09-10,T-Mobile Arena,Las Vegas Nevada,18901,8100000,20000,0.945,,Wikipedia
+UFC 278,2022-08-20,Vivint Arena,Salt Lake City Utah,17406,6500000,18000,0.967,,Wikipedia
+UFC 277,2022-07-30,American Airlines Center,Dallas Texas,18815,7200000,19000,0.990,,Wikipedia
+UFC 276,2022-07-02,T-Mobile Arena,Las Vegas Nevada,20426,12500000,20000,1.021,,Wikipedia
+UFC 275,2022-06-11,Singapore Indoor Stadium,Kallang Singapore,9856,3800000,10000,0.986,,Wikipedia
+UFC 274,2022-05-07,Footprint Center,Phoenix Arizona,17258,7100000,18000,0.959,,Wikipedia
+UFC 273,2022-04-09,Vystar Veterans Arena,Jacksonville Florida,15129,5900000,15000,1.009,,Wikipedia
+UFC 272,2022-03-05,T-Mobile Arena,Las Vegas Nevada,17268,10500000,20000,0.863,,Wikipedia
+UFC 271,2022-02-12,Toyota Center,Houston Texas,18432,6800000,18500,0.996,,Wikipedia
+UFC 270,2022-01-22,Honda Center,Anaheim California,17120,4100000,18000,0.951,,Wikipedia
+UFC 269,2021-12-11,T-Mobile Arena,Las Vegas Nevada,17927,8500000,20000,0.896,,Wikipedia
+UFC 268,2021-11-06,Madison Square Garden,New York New York,20715,14200000,20000,1.036,,Wikipedia
+UFC 267,2021-10-30,Etihad Arena,Abu Dhabi UAE,10000,3500000,12000,0.833,,Wikipedia
+UFC 266,2021-09-25,T-Mobile Arena,Las Vegas Nevada,17246,6500000,20000,0.862,,Wikipedia
+UFC 265,2021-08-07,Toyota Center,Houston Texas,17802,5100000,18500,0.962,,Wikipedia
+UFC 264,2021-07-10,T-Mobile Arena,Las Vegas Nevada,20062,15700000,20000,1.003,,Wikipedia
+UFC 263,2021-06-12,Gila River Arena,Glendale Arizona,16802,5800000,17500,0.960,,Wikipedia
+UFC 262,2021-05-15,Toyota Center,Houston Texas,16003,3500000,18500,0.865,,Wikipedia
+UFC 261,2021-04-24,VyStar Veterans Arena,Jacksonville Florida,15269,4000000,15000,1.018,,Wikipedia
+UFC 260,2021-03-27,UFC Apex,Las Vegas Nevada,,,500,,,Wikipedia
+UFC 259,2021-03-06,UFC Apex,Las Vegas Nevada,,,500,,,Wikipedia
+UFC 258,2021-02-13,UFC Apex,Las Vegas Nevada,,,500,,,Wikipedia
+UFC 257,2021-01-23,Etihad Arena,Abu Dhabi UAE,2000,1000000,12000,0.167,,Wikipedia
+UFC 256,2020-12-12,UFC Apex,Las Vegas Nevada,,,500,,,Wikipedia
+UFC 255,2020-11-21,UFC Apex,Las Vegas Nevada,,,500,,,Wikipedia
+UFC 254,2020-10-24,Flash Forum,Abu Dhabi UAE,2000,,5000,0.400,,Wikipedia
+UFC 253,2020-09-27,Flash Forum,Abu Dhabi UAE,2000,,5000,0.400,,Wikipedia
+UFC 252,2020-08-15,UFC Apex,Las Vegas Nevada,,,500,,,Wikipedia
+UFC 251,2020-07-12,Flash Forum,Abu Dhabi UAE,2000,,5000,0.400,,Wikipedia
+UFC 250,2020-06-06,UFC Apex,Las Vegas Nevada,,,500,,,Wikipedia
+UFC 249,2020-05-09,VyStar Veterans Arena,Jacksonville Florida,0,,15000,0.000,,Wikipedia
+UFC 248,2020-03-07,T-Mobile Arena,Las Vegas Nevada,15125,4200000,20000,0.756,,Wikipedia
+UFC 247,2020-02-08,Toyota Center,Houston Texas,16531,3500000,18500,0.894,,Wikipedia
+UFC 246,2020-01-18,T-Mobile Arena,Las Vegas Nevada,19040,10900000,20000,0.952,,Wikipedia
+UFC 245,2019-12-14,T-Mobile Arena,Las Vegas Nevada,17401,5800000,20000,0.870,,Wikipedia
+UFC 244,2019-11-02,Madison Square Garden,New York New York,20243,6600000,20000,1.012,,Wikipedia
+UFC 243,2019-10-06,Marvel Stadium,Melbourne Australia,57127,13200000,60000,0.952,,Wikipedia
+UFC 242,2019-09-07,The Arena,Abu Dhabi UAE,13862,4100000,14000,0.990,,Wikipedia
+UFC 241,2019-08-17,Honda Center,Anaheim California,16984,4300000,18000,0.944,,Wikipedia
+UFC 240,2019-07-27,Rogers Place,Edmonton Canada,18091,4000000,19000,0.952,,Wikipedia
+UFC 239,2019-07-06,T-Mobile Arena,Las Vegas Nevada,17034,5900000,20000,0.852,,Wikipedia
+UFC 238,2019-06-08,United Center,Chicago Illinois,19428,5300000,20000,0.971,,Wikipedia
+UFC 237,2019-05-11,Jeunesse Arena,Rio de Janeiro Brazil,10897,1600000,16000,0.681,,Wikipedia
+UFC 236,2019-04-13,State Farm Arena,Atlanta Georgia,14803,3200000,18500,0.800,,Wikipedia
+UFC 235,2019-03-02,T-Mobile Arena,Las Vegas Nevada,18742,6200000,20000,0.937,,Wikipedia
+UFC 234,2019-02-10,Rod Laver Arena,Melbourne Australia,15163,3400000,15000,1.011,,Wikipedia
+UFC 233,,,,,,,,,Cancelled
+UFC 232,2018-12-29,The Forum,Inglewood California,15520,4100000,17500,0.887,,Wikipedia
+UFC 231,2018-12-08,Scotiabank Arena,Toronto Canada,19221,4500000,20000,0.961,,Wikipedia
+UFC 230,2018-11-03,Madison Square Garden,New York New York,20034,5500000,20000,1.002,,Wikipedia
+UFC 229,2018-10-06,T-Mobile Arena,Las Vegas Nevada,20034,17188894,20000,1.002,2400000,Wikipedia
+UFC 228,2018-09-08,American Airlines Center,Dallas Texas,16269,3200000,19000,0.856,,Wikipedia
+UFC 227,2018-08-04,Staples Center,Los Angeles California,15621,3300000,18000,0.868,,Wikipedia
+UFC 226,2018-07-07,T-Mobile Arena,Las Vegas Nevada,17809,6500000,20000,0.890,,Wikipedia
+UFC 225,2018-06-09,United Center,Chicago Illinois,16865,4500000,20000,0.843,,Wikipedia
+UFC 224,2018-05-12,Jeunesse Arena,Rio de Janeiro Brazil,11934,2000000,16000,0.746,,Wikipedia
+UFC 223,2018-04-07,Barclays Center,Brooklyn New York,17733,3500000,18000,0.985,,Wikipedia
+UFC 222,2018-03-03,T-Mobile Arena,Las Vegas Nevada,14632,2700000,20000,0.732,,Wikipedia
+UFC 221,2018-02-11,Perth Arena,Perth Australia,13411,2800000,15500,0.865,,Wikipedia
+UFC 220,2018-01-20,TD Garden,Boston Massachusetts,17428,3200000,18000,0.968,,Wikipedia
+UFC 219,2017-12-30,T-Mobile Arena,Las Vegas Nevada,12467,2500000,20000,0.623,,Wikipedia
+UFC 218,2017-12-02,Little Caesars Arena,Detroit Michigan,16856,3000000,20000,0.843,,Wikipedia
+UFC 217,2017-11-04,Madison Square Garden,New York New York,20115,6200000,20000,1.006,,Wikipedia
+UFC 216,2017-10-07,T-Mobile Arena,Las Vegas Nevada,10539,2100000,20000,0.527,,Wikipedia
+UFC 215,2017-09-09,Rogers Place,Edmonton Canada,16888,3200000,19000,0.889,,Wikipedia
+UFC 214,2017-07-29,Honda Center,Anaheim California,16060,3300000,18000,0.892,,Wikipedia
+UFC 213,2017-07-08,T-Mobile Arena,Las Vegas Nevada,16167,4200000,20000,0.808,,Wikipedia
+UFC 212,2017-06-03,Jeunesse Arena,Rio de Janeiro Brazil,13025,2200000,16000,0.814,,Wikipedia
+UFC 211,2017-05-13,American Airlines Center,Dallas Texas,18186,4700000,19000,0.957,,Wikipedia
+UFC 210,2017-04-08,KeyBank Center,Buffalo New York,17612,3300000,18000,0.978,,Wikipedia
+UFC 209,2017-03-04,T-Mobile Arena,Las Vegas Nevada,15649,4400000,20000,0.782,,Wikipedia
+UFC 208,2017-02-11,Barclays Center,Brooklyn New York,14248,2200000,18000,0.792,,Wikipedia
+UFC 207,2016-12-30,T-Mobile Arena,Las Vegas Nevada,18533,7600000,20000,0.927,,Wikipedia
+UFC 206,2016-12-10,Air Canada Centre,Toronto Canada,16918,3200000,19000,0.890,,Wikipedia
+UFC 205,2016-11-12,Madison Square Garden,New York New York,20427,17700000,20000,1.021,1300000,Wikipedia
+UFC 204,2016-10-08,Manchester Arena,Manchester England,15141,2900000,21000,0.721,,Wikipedia
+UFC 203,2016-09-10,Quicken Loans Arena,Cleveland Ohio,18429,3800000,19000,0.970,,Wikipedia
+UFC 202,2016-08-20,T-Mobile Arena,Las Vegas Nevada,15539,7700000,20000,0.777,1650000,Wikipedia
+UFC 201,2016-07-30,Philips Arena,Atlanta Georgia,13411,2400000,18500,0.725,,Wikipedia
+UFC 200,2016-07-09,T-Mobile Arena,Las Vegas Nevada,18202,10746248,20000,0.910,1010000,Wikipedia
