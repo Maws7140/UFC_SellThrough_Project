@@ -1,0 +1,1887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UFC Sell-Through Prediction | DS 410 Final Project</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* MAWS Brand Colors */
+            --maws-purple: #6b5b95;
+            --maws-dark-purple: #2d1b4e;
+            --maws-gold: #ffd700;
+            
+            /* Retro Tech Colors */
+            --tv-casing: #222024;
+            --screen-black: #0f0f0f;
+            --phosphor-green: #33ff00;
+            --phosphor-amber: #ffb000;
+            
+            /* VHS Colors */
+            --vhs-blue: #0066cc;
+            --vhs-red: #cc3300;
+            
+            /* Backgrounds */
+            --bg-dark: #101010;
+            --bg-lighter: #1a1a1a;
+            --bg-card: #1f1f1f;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: white;
+            font-family: 'VT323', monospace;
+            overflow-x: hidden;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        /* CRT Scanlines Overlay */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* VHS Tracking Bar */
+        .vhs-tracking {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                var(--phosphor-green) 20%, 
+                var(--maws-gold) 50%, 
+                var(--phosphor-green) 80%, 
+                transparent 100%);
+            z-index: 10000;
+            animation: trackingPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes trackingPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Hero Section - VHS Tape Style */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1a1025 50%, var(--bg-dark) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(107, 91, 149, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(255, 215, 0, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .vhs-case {
+            background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
+            border: 3px solid #333;
+            border-radius: 8px;
+            padding: 40px;
+            max-width: 900px;
+            width: 90%;
+            position: relative;
+            box-shadow: 
+                0 0 0 2px #111,
+                0 20px 60px rgba(0,0,0,0.8),
+                inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+
+        .vhs-label {
+            background: linear-gradient(180deg, #f5f5dc 0%, #e8e8c8 100%);
+            border: 2px solid #999;
+            border-radius: 4px;
+            padding: 30px;
+            color: #111;
+            text-align: center;
+            position: relative;
+        }
+
+        .vhs-label::before {
+            content: 'DS/CMPSC 410';
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.5rem;
+            color: var(--maws-purple);
+        }
+
+        .vhs-label::after {
+            content: 'FALL 2025';
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.5rem;
+            color: var(--maws-purple);
+        }
+
+        .project-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(1rem, 3vw, 1.8rem);
+            color: #111;
+            margin-bottom: 15px;
+            line-height: 1.8;
+            text-shadow: 2px 2px 0 rgba(107, 91, 149, 0.3);
+        }
+
+        .project-subtitle {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .author-name {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.7rem;
+            color: var(--maws-dark-purple);
+            margin-top: 20px;
+            letter-spacing: 1px;
+        }
+
+        .vhs-stripe {
+            height: 8px;
+            background: linear-gradient(90deg, 
+                var(--maws-purple) 0%, 
+                var(--maws-gold) 25%, 
+                var(--phosphor-green) 50%, 
+                var(--maws-gold) 75%, 
+                var(--maws-purple) 100%);
+            margin: 20px 0;
+            border-radius: 2px;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .hero-stat {
+            text-align: center;
+        }
+
+        .hero-stat-value {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.2rem;
+            color: var(--maws-purple);
+        }
+
+        .hero-stat-label {
+            font-size: 1rem;
+            color: #666;
+        }
+
+        /* Navigation */
+        .nav-bar {
+            position: sticky;
+            top: 0;
+            background: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--maws-purple);
+            padding: 15px 20px;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .nav-link {
+            font-family: 'VT323', monospace;
+            font-size: 1.2rem;
+            color: var(--phosphor-green);
+            text-decoration: none;
+            padding: 8px 16px;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--maws-gold);
+            border-color: var(--maws-gold);
+            text-shadow: 0 0 10px var(--maws-gold);
+        }
+
+        /* Section Styling */
+        .section {
+            padding: 80px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(1rem, 2.5vw, 1.5rem);
+            color: var(--maws-gold);
+            margin-bottom: 40px;
+            text-align: center;
+            text-shadow: 3px 3px 0 var(--maws-dark-purple);
+            position: relative;
+        }
+
+        .section-title::before,
+        .section-title::after {
+            content: '*';
+            color: var(--phosphor-green);
+            margin: 0 20px;
+        }
+
+        /* CRT Monitor Card */
+        .crt-card {
+            background: var(--tv-casing);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 8px solid #1a1a1a;
+            box-shadow: 
+                inset 0 0 20px rgba(0,0,0,0.8),
+                0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        .crt-screen {
+            background: var(--screen-black);
+            border-radius: 30px / 20px;
+            padding: 30px;
+            border: 3px solid #333;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .crt-screen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.3) 100%);
+            pointer-events: none;
+        }
+
+        .crt-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .crt-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.9rem;
+            color: var(--phosphor-green);
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px var(--phosphor-green);
+        }
+
+        .crt-text {
+            color: var(--phosphor-green);
+            font-size: 1.3rem;
+            text-shadow: 0 0 5px var(--phosphor-green);
+            line-height: 1.8;
+        }
+
+        /* Data Source Grid */
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .data-card {
+            background: var(--bg-card);
+            border: 2px solid var(--maws-purple);
+            border-radius: 10px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .data-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--maws-gold);
+        }
+
+        .data-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(107, 91, 149, 0.3);
+            border-color: var(--maws-gold);
+        }
+
+        .data-card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .data-card-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.7rem;
+            color: var(--maws-gold);
+            margin-bottom: 10px;
+        }
+
+        .data-card-stats {
+            color: var(--phosphor-green);
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .data-card-desc {
+            color: #aaa;
+            font-size: 1.1rem;
+        }
+
+        .data-card-time {
+            color: var(--maws-purple);
+            font-size: 1rem;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        /* Stats Table */
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 1.2rem;
+        }
+
+        .stats-table th,
+        .stats-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
+
+        .stats-table th {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6rem;
+            color: var(--maws-gold);
+            background: var(--bg-card);
+        }
+
+        .stats-table td {
+            color: var(--phosphor-green);
+        }
+
+        .stats-table tr:hover td {
+            background: rgba(107, 91, 149, 0.1);
+        }
+
+        /* Pipeline Diagram */
+        .pipeline {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 40px 0;
+            position: relative;
+        }
+
+        .pipeline::before {
+            content: '';
+            position: absolute;
+            top: 60px;
+            left: 10%;
+            right: 10%;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                var(--maws-purple), 
+                var(--maws-gold), 
+                var(--phosphor-green));
+            z-index: 0;
+        }
+
+        .pipeline-step {
+            flex: 1;
+            min-width: 150px;
+            max-width: 180px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .pipeline-node {
+            width: 80px;
+            height: 80px;
+            background: var(--bg-card);
+            border: 3px solid var(--maws-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .pipeline-step:hover .pipeline-node {
+            background: var(--maws-purple);
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+        }
+
+        .pipeline-label {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.5rem;
+            color: var(--maws-gold);
+            margin-bottom: 8px;
+        }
+
+        .pipeline-desc {
+            font-size: 1rem;
+            color: #aaa;
+            line-height: 1.4;
+        }
+
+        /* Feature Categories */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .feature-box {
+            background: linear-gradient(135deg, var(--bg-card) 0%, #252525 100%);
+            border-left: 4px solid var(--phosphor-green);
+            padding: 25px;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .feature-box-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6rem;
+            color: var(--maws-gold);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-box-content {
+            color: #ccc;
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+
+        /* Results Section */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        @media (max-width: 768px) {
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .metric-card {
+            background: var(--bg-card);
+            border: 2px solid var(--maws-purple);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--maws-purple), var(--maws-gold));
+        }
+
+        .metric-value {
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(2rem, 5vw, 3rem);
+            color: var(--maws-gold);
+            text-shadow: 3px 3px 0 var(--maws-dark-purple);
+            margin-bottom: 10px;
+        }
+
+        .metric-label {
+            font-size: 1.3rem;
+            color: #aaa;
+        }
+
+        .metric-desc {
+            font-size: 1rem;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        /* Comparison Table */
+        .comparison-section {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 40px 0;
+        }
+
+        .comparison-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 10px;
+            padding: 15px;
+            background: var(--maws-dark-purple);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .comparison-header span {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.5rem;
+            color: var(--maws-gold);
+            text-align: center;
+        }
+
+        .comparison-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 10px;
+            padding: 15px;
+            border-bottom: 1px solid #333;
+        }
+
+        .comparison-row span {
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        .comparison-row .metric-name {
+            color: #aaa;
+            text-align: left;
+        }
+
+        .comparison-row .run1 {
+            color: var(--phosphor-green);
+        }
+
+        .comparison-row .run2 {
+            color: var(--phosphor-amber);
+        }
+
+        .comparison-row .improvement {
+            color: var(--maws-gold);
+        }
+
+        /* Challenges Section */
+        .challenge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .challenge-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid #333;
+            transition: all 0.3s ease;
+        }
+
+        .challenge-card:hover {
+            border-color: var(--maws-purple);
+            transform: translateX(5px);
+        }
+
+        .challenge-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+
+        .challenge-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6rem;
+            color: var(--vhs-red);
+            margin-bottom: 10px;
+        }
+
+        .challenge-solution {
+            color: var(--phosphor-green);
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        /* Card Optimizer Demo */
+        .optimizer-demo {
+            background: linear-gradient(135deg, var(--maws-dark-purple) 0%, var(--bg-dark) 100%);
+            border: 3px solid var(--maws-gold);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 40px 0;
+        }
+
+        .optimizer-header {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .optimizer-stat {
+            text-align: center;
+        }
+
+        .optimizer-stat-value {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 2.5rem;
+            color: var(--maws-gold);
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .optimizer-stat-label {
+            font-size: 1.2rem;
+            color: #aaa;
+            margin-top: 5px;
+        }
+
+        .fight-list {
+            list-style: none;
+        }
+
+        .fight-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 4px solid var(--maws-gold);
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .fight-rank {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.5rem;
+            color: var(--maws-gold);
+            min-width: 50px;
+        }
+
+        .fight-details {
+            flex: 1;
+        }
+
+        .fight-matchup {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.7rem;
+            color: white;
+            margin-bottom: 5px;
+        }
+
+        .fight-meta {
+            color: var(--phosphor-green);
+            font-size: 1.1rem;
+        }
+
+        .fight-score {
+            font-size: 1.3rem;
+            color: var(--maws-purple);
+        }
+
+        /* Learnings Section */
+        .learnings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+        }
+
+        @media (max-width: 500px) {
+            .learnings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .learning-box {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 30px;
+        }
+
+        .learning-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.8rem;
+            color: var(--maws-gold);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .learning-list {
+            list-style: none;
+        }
+
+        .learning-list li {
+            padding: 10px 0;
+            padding-left: 25px;
+            position: relative;
+            color: #ccc;
+            font-size: 1.2rem;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .learning-list li::before {
+            content: '>';
+            position: absolute;
+            left: 0;
+            color: var(--phosphor-green);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--tv-casing);
+            padding: 60px 20px;
+            text-align: center;
+            border-top: 4px solid var(--maws-purple);
+        }
+
+        .footer-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.5rem;
+            color: var(--maws-gold);
+            margin-bottom: 30px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .footer-link {
+            color: var(--phosphor-green);
+            text-decoration: none;
+            font-size: 1.3rem;
+            padding: 10px 20px;
+            border: 1px solid var(--phosphor-green);
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .footer-link:hover {
+            background: var(--phosphor-green);
+            color: var(--bg-dark);
+        }
+
+        .footer-credits {
+            color: #666;
+            font-size: 1rem;
+            margin-top: 30px;
+        }
+
+        .footer-credits a {
+            color: var(--maws-purple);
+            text-decoration: none;
+        }
+
+        .footer-credits a:hover {
+            color: var(--maws-gold);
+        }
+
+        /* Back to Portfolio Button */
+        .back-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--maws-purple);
+            color: white;
+            text-decoration: none;
+            padding: 15px 20px;
+            border-radius: 50px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6rem;
+            z-index: 100;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(107, 91, 149, 0.5);
+        }
+
+        .back-btn:hover {
+            background: var(--maws-gold);
+            color: var(--bg-dark);
+            transform: translateY(-3px);
+        }
+
+        /* Strengths/Limitations */
+        .strengths-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .strength-box {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 30px;
+            border-top: 4px solid var(--phosphor-green);
+        }
+
+        .limitation-box {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 30px;
+            border-top: 4px solid var(--vhs-red);
+        }
+
+        .box-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.7rem;
+            margin-bottom: 20px;
+        }
+
+        .strength-box .box-title {
+            color: var(--phosphor-green);
+        }
+
+        .limitation-box .box-title {
+            color: var(--vhs-red);
+        }
+
+        .box-list {
+            list-style: none;
+        }
+
+        .box-list li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            color: #bbb;
+            font-size: 1.1rem;
+        }
+
+        .strength-box .box-list li::before {
+            content: '+';
+            position: absolute;
+            left: 0;
+            color: var(--phosphor-green);
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+
+        .limitation-box .box-list li::before {
+            content: '–';
+            position: absolute;
+            left: 0;
+            color: var(--vhs-red);
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+
+        /* Visualizations placeholder */
+        .viz-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .viz-card {
+            background: var(--bg-card);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .viz-placeholder {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 2px dashed var(--maws-purple);
+            border-radius: 8px;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .viz-placeholder-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .viz-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6rem;
+            color: var(--maws-gold);
+        }
+
+        .viz-desc {
+            color: #888;
+            font-size: 1rem;
+            margin-top: 10px;
+        }
+
+        .viz-image {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            border: 2px solid #333;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .viz-image:hover {
+            border-color: var(--maws-gold);
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
+        }
+
+        /* Full-width visualization cards */
+        .viz-full {
+            grid-column: 1 / -1;
+        }
+
+        .viz-card-large {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .viz-card-large .viz-image {
+            max-height: 500px;
+            object-fit: contain;
+        }
+
+        /* Image modal for full-screen viewing */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            cursor: pointer;
+        }
+
+        .modal img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 95%;
+            max-height: 95%;
+            border-radius: 10px;
+            border: 3px solid var(--maws-gold);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: var(--maws-gold);
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10002;
+        }
+
+        .modal-close:hover {
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .pipeline::before {
+                display: none;
+            }
+            
+            .pipeline {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .pipeline-step {
+                max-width: 100%;
+            }
+            
+            .comparison-header,
+            .comparison-row {
+                grid-template-columns: 1fr 1fr;
+                gap: 5px;
+            }
+            
+            .nav-bar {
+                padding: 10px;
+            }
+            
+            .nav-link {
+                font-size: 1rem;
+                padding: 5px 10px;
+            }
+        }
+
+        /* Scroll animation */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Highlight text */
+        .highlight {
+            color: var(--maws-gold);
+            font-weight: bold;
+        }
+
+        .highlight-green {
+            color: var(--phosphor-green);
+        }
+
+        /* Tech stack badges */
+        .tech-badge {
+            display: inline-block;
+            background: var(--maws-dark-purple);
+            color: var(--maws-gold);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="scanlines"></div>
+    <div class="vhs-tracking"></div>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="vhs-case">
+            <div class="vhs-label">
+                <h1 class="project-title">UFC SELL-THROUGH<br>PREDICTION PROJECT</h1>
+                <p class="project-subtitle">Big Data Analytics & Machine Learning Pipeline</p>
+                <div class="vhs-stripe"></div>
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">2.8M</div>
+                        <div class="hero-stat-label">Records</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">47.6%</div>
+                        <div class="hero-stat-label">R² Score</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">80%</div>
+                        <div class="hero-stat-label">Improvement</div>
+                    </div>
+                </div>
+                <p class="author-name">Oluwaferanmi Samuel Wale-Bogunjoko</p>
+                <p style="color: #666; font-size: 0.9rem; margin-top: 5px;">Penn State University</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Navigation -->
+    <nav class="nav-bar">
+        <a href="#problem" class="nav-link">Problem</a>
+        <a href="#data" class="nav-link">Data</a>
+        <a href="#pipeline" class="nav-link">Pipeline</a>
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#results" class="nav-link">Results</a>
+        <a href="#visualizations" class="nav-link">Visuals</a>
+        <a href="#challenges" class="nav-link">Challenges</a>
+        <a href="#optimizer" class="nav-link">Optimizer</a>
+        <a href="#learnings" class="nav-link">Learnings</a>
+    </nav>
+
+    <!-- Problem Statement -->
+    <section class="section" id="problem">
+        <h2 class="section-title">Problem Statement</h2>
+        
+        <div class="crt-card fade-in">
+            <div class="crt-screen">
+                <div class="crt-content">
+                    <h3 class="crt-title">THE CHALLENGE OF PREDICTION</h3>
+                    <p class="crt-text">
+                        <span class="highlight">Domain:</span> Sports analytics (UFC live events)<br><br>
+                        <span class="highlight">Business Problem:</span> Predict event sell-through (tickets sold/capacity) to forecast attendance and revenue, driven by fight card, location, timing, and hype.<br><br>
+                        <span class="highlight">Data Blend:</span> Internal (fight/event details, venue capacity) and External (betting odds, Reddit/Trends sentiment, fighter popularity graph).<br><br>
+                        <span class="highlight">Big-data approach:</span> Use Spark to join, clean, and model millions of diverse records (history, ticket logs, social media, fighter networks) faster than a local device.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="crt-card fade-in">
+            <div class="crt-screen">
+                <div class="crt-content">
+                    <h3 class="crt-title">WHY SELL-THROUGH MATTERS</h3>
+                    <p class="crt-text">
+                        > Plan venues and ops with realistic attendance forecasts<br><br>
+                        > Set dynamic pricing and promotions to hit revenue targets<br><br>
+                        > Shape fight cards to maximize fan appeal and sell-through
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Data Sources -->
+    <section class="section" id="data">
+        <h2 class="section-title">Data Sources & Collection</h2>
+        
+        <p style="text-align: center; color: #aaa; font-size: 1.3rem; margin-bottom: 30px;">
+            A comprehensive multi-source data pipeline integrating fight statistics, attendance records, betting markets, fan sentiment, and search trends.
+        </p>
+
+        <div class="data-grid">
+            <div class="data-card fade-in">
+                <div class="data-card-icon">[DB]</div>
+                <h3 class="data-card-title">UFCStats.com</h3>
+                <p class="data-card-stats">756 events • 8,482 fights • 4,449 fighters</p>
+                <p class="data-card-desc">39,912 round-by-round statistics spanning 1993-2025. GitHub repository download.</p>
+                <p class="data-card-time">~1 minute collection</p>
+            </div>
+
+            <div class="data-card fade-in">
+                <div class="data-card-icon">[W]</div>
+                <h3 class="data-card-title">Wikipedia</h3>
+                <p class="data-card-stats">645 events • 85.3% coverage</p>
+                <p class="data-card-desc">Attendance data, gate revenue, venue capacity, and venue names via BeautifulSoup.</p>
+                <p class="data-card-time">~2 hours with rate limiting</p>
+            </div>
+
+            <div class="data-card fade-in">
+                <div class="data-card-icon">[$]</div>
+                <h3 class="data-card-title">Betting Odds</h3>
+                <p class="data-card-stats">8,482 fights with market odds</p>
+                <p class="data-card-desc">BestFightOdds.com and Kaggle backup. Converts American odds to implied probabilities.</p>
+                <p class="data-card-time">~4 hours collection</p>
+            </div>
+
+            <div class="data-card fade-in">
+                <div class="data-card-icon">[^]</div>
+                <h3 class="data-card-title">Google Trends</h3>
+                <p class="data-card-stats">2.3 million data points</p>
+                <p class="data-card-desc">Search interest for 4,400+ fighters. Pytrends API with 7-day and 30-day windows.</p>
+                <p class="data-card-time">~8 hours with rate limiting</p>
+            </div>
+
+            <div class="data-card fade-in">
+                <div class="data-card-icon">[R]</div>
+                <h3 class="data-card-title">Reddit Sentiment</h3>
+                <p class="data-card-stats">380,000 comments • ~200 events</p>
+                <p class="data-card-desc">r/MMA discussion threads. PRAW and TextBlob analyze sentiment polarity and hype scores.</p>
+                <p class="data-card-time">~2 hours collection</p>
+            </div>
+
+            <div class="data-card fade-in">
+                <div class="data-card-icon">[*]</div>
+                <h3 class="data-card-title">Holiday Calendar</h3>
+                <p class="data-card-stats">US, Canada, UK holidays (2010-2025)</p>
+                <p class="data-card-desc">Nager.Date API for feature engineering around holiday proximity and event timing.</p>
+                <p class="data-card-time">Instant API calls</p>
+            </div>
+        </div>
+
+        <div class="crt-card fade-in" style="margin-top: 40px;">
+            <div class="crt-screen">
+                <div class="crt-content">
+                    <h3 class="crt-title">DATA VOLUME SUMMARY</h3>
+                    <table class="stats-table">
+                        <thead>
+                            <tr>
+                                <th>Source</th>
+                                <th>Records</th>
+                                <th>Size</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>UFCStats</td>
+                                <td>~53,000</td>
+                                <td>11 MB</td>
+                            </tr>
+                            <tr>
+                                <td>Wikipedia</td>
+                                <td>645 events</td>
+                                <td>50 KB</td>
+                            </tr>
+                            <tr>
+                                <td>Betting Odds</td>
+                                <td>~8,482</td>
+                                <td>50 MB</td>
+                            </tr>
+                            <tr>
+                                <td>Google Trends</td>
+                                <td>~2.3M</td>
+                                <td>200 MB</td>
+                            </tr>
+                            <tr>
+                                <td>Reddit</td>
+                                <td>~380K</td>
+                                <td>150 MB</td>
+                            </tr>
+                            <tr>
+                                <td style="color: var(--maws-gold);">TOTAL</td>
+                                <td style="color: var(--maws-gold);">~2.8M</td>
+                                <td style="color: var(--maws-gold);">~430 MB</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture & Pipeline -->
+    <section class="section" id="pipeline">
+        <h2 class="section-title">Architecture & Pipeline</h2>
+
+        <div class="pipeline fade-in">
+            <div class="pipeline-step">
+                <div class="pipeline-node">01</div>
+                <p class="pipeline-label">DATA COLLECTION</p>
+                <p class="pipeline-desc">Gather from GitHub, Wikipedia, betting sites, Google Trends, Reddit via automated scripts</p>
+            </div>
+            <div class="pipeline-step">
+                <div class="pipeline-node">02</div>
+                <p class="pipeline-label">SPARK ETL</p>
+                <p class="pipeline-desc">Clean, join, integrate using PySpark for distributed processing</p>
+            </div>
+            <div class="pipeline-step">
+                <div class="pipeline-node">03</div>
+                <p class="pipeline-label">GRAPH ANALYSIS</p>
+                <p class="pipeline-desc">GraphFrames for PageRank and community detection among fighters</p>
+            </div>
+            <div class="pipeline-step">
+                <div class="pipeline-node">04</div>
+                <p class="pipeline-label">FEATURE ENG.</p>
+                <p class="pipeline-desc">Rolling stats, external data, event metrics using window functions</p>
+            </div>
+            <div class="pipeline-step">
+                <div class="pipeline-node">05</div>
+                <p class="pipeline-label">MODEL TRAINING</p>
+                <p class="pipeline-desc">GBT Regressor with cross-validation, time-based train/test split</p>
+            </div>
+            <div class="pipeline-step">
+                <div class="pipeline-node">06</div>
+                <p class="pipeline-label">VISUALIZATION</p>
+                <p class="pipeline-desc">10 comprehensive visualizations for analysis and business insights</p>
+            </div>
+        </div>
+
+        <div class="crt-card fade-in">
+            <div class="crt-screen">
+                <div class="crt-content">
+                    <h3 class="crt-title">KEY TECHNOLOGIES</h3>
+                    <p class="crt-text">
+                        <span class="highlight">PySpark DataFrames</span> — Distributed processing with window functions for rolling statistics<br><br>
+                        <span class="highlight">GraphFrames</span> — Network analytics: PageRank and community detection for fighter dynamics<br><br>
+                        <span class="highlight">Spark MLlib</span> — Gradient Boosted Trees (GBT) Regressor for sell-through prediction
+                    </p>
+                    <div style="margin-top: 20px;">
+                        <span class="tech-badge">PySpark</span>
+                        <span class="tech-badge">GraphFrames</span>
+                        <span class="tech-badge">MLlib</span>
+                        <span class="tech-badge">BeautifulSoup</span>
+                        <span class="tech-badge">PRAW</span>
+                        <span class="tech-badge">Pytrends</span>
+                        <span class="tech-badge">TextBlob</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="crt-card fade-in">
+            <div class="crt-screen">
+                <div class="crt-content">
+                    <h3 class="crt-title">CLUSTER CONFIGURATION</h3>
+                    <p class="crt-text">
+                        <span class="highlight">Primary:</span> 4 CPU nodes<br>
+                        <span class="highlight">Configuration:</span> 8 cores, 64 GB RAM per node<br>
+                        <span class="highlight">Workload:</span> ~2.8M records and ML training<br><br>
+                        <span class="highlight-green">Performance:</span><br>
+                        1 core: ~32-35 minutes<br>
+                        4 cores: ~12-15 minutes<br>
+                        8 cores: ~10-11 minutes<br>
+                        16 cores: effectively stalled (overhead exceeded benefit)
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Feature Engineering -->
+    <section class="section" id="features">
+        <h2 class="section-title">Feature Engineering</h2>
+
+        <div class="feature-grid">
+            <div class="feature-box fade-in">
+                <h3 class="feature-box-title">[~] Rolling Fighter Statistics</h3>
+                <p class="feature-box-content">
+                    Calculated fighter performance metrics over recent fights using window functions: win rate, finish rate, layoff time, average strikes landed, and takedown success rate.
+                </p>
+            </div>
+
+            <div class="feature-box fade-in">
+                <h3 class="feature-box-title">[+] Graph-Based Features</h3>
+                <p class="feature-box-content">
+                    GraphFrames to analyze fighter networks with PageRank scores, community detection, and network size metrics to capture fighter influence and matchup dynamics.
+                </p>
+            </div>
+
+            <div class="feature-box fade-in">
+                <h3 class="feature-box-title">[$] Betting Features</h3>
+                <p class="feature-box-content">
+                    Incorporated betting odds data: spread, implied probabilities, and competitiveness to reflect market expectations and fight competitiveness.
+                </p>
+            </div>
+
+            <div class="feature-box fade-in">
+                <h3 class="feature-box-title">[#] External Data Features</h3>
+                <p class="feature-box-content">
+                    Integrated Google Trends search interest and Reddit sentiment scores to capture pre-event buzz, fan engagement, and public sentiment.
+                </p>
+            </div>
+
+            <div class="feature-box fade-in">
+                <h3 class="feature-box-title">[*] Event-Level Features</h3>
+                <p class="feature-box-content">
+                    Card-level attributes: number of fights, title fights, rematches, average fighter win rate, event date features, and location indicators.
+                </p>
+            </div>
+        </div>
+
+        <div class="comparison-section fade-in" style="margin-top: 40px;">
+            <h3 style="font-family: 'Press Start 2P', cursive; font-size: 0.8rem; color: var(--maws-gold); margin-bottom: 20px; text-align: center;">
+                FEATURE COUNT COMPARISON
+            </h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div style="padding: 20px; background: rgba(51, 255, 0, 0.1); border-radius: 10px; border: 1px solid var(--phosphor-green);">
+                    <h4 style="font-family: 'Press Start 2P', cursive; font-size: 0.6rem; color: var(--phosphor-green); margin-bottom: 15px;">RUN 1: FULL PIPELINE (36 features)</h4>
+                    <ul style="list-style: none; color: #ccc; font-size: 1.1rem;">
+                        <li>> Rolling fighter statistics (win rate, finish rate, takedown success)</li>
+                        <li>> Graph-based features (PageRank, network metrics)</li>
+                        <li>> External data (betting odds, Google Trends, Reddit)</li>
+                        <li>> Event-level details (fights, title fights, rematches)</li>
+                        <li style="color: var(--phosphor-green); margin-top: 10px;">-> R² of 0.4763 (47.6% variance explained)</li>
+                    </ul>
+                </div>
+                <div style="padding: 20px; background: rgba(255, 176, 0, 0.1); border-radius: 10px; border: 1px solid var(--phosphor-amber);">
+                    <h4 style="font-family: 'Press Start 2P', cursive; font-size: 0.6rem; color: var(--phosphor-amber); margin-bottom: 15px;">RUN 2: MINIMAL PIPELINE (9 features)</h4>
+                    <ul style="list-style: none; color: #ccc; font-size: 1.1rem;">
+                        <li>> Basic event-level features only</li>
+                        <li>> Average fighter win rate, day of week, month</li>
+                        <li>> Location flags (USA, Saturday, PPV)</li>
+                        <li>> No graph analytics or external data</li>
+                        <li style="color: var(--phosphor-amber); margin-top: 10px;">-> R² of 0.2644 (26.4% variance explained)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="crt-card fade-in" style="margin-top: 30px;">
+            <div class="crt-screen">
+                <div class="crt-content">
+                    <h3 class="crt-title">KEY FINDING: DOMINANT PREDICTORS</h3>
+                    <p class="crt-text">
+                        <span class="highlight">Leading Variables:</span> Month, days_since_last, is_vegas, is_ppv, day_of_week<br><br>
+                        <span class="highlight">Least Impactful:</span> Reddit signals have the least predictive power<br><br>
+                        Calendar/Recency and Venue are the dominant predictors for sell-through rates.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Model Results -->
+    <section class="section" id="results">
+        <h2 class="section-title">Model Results</h2>
+
+        <div class="results-grid fade-in">
+            <div class="metric-card">
+                <div class="metric-value">0.48</div>
+                <div class="metric-label">R² Score</div>
+                <div class="metric-desc">Explains 47.6% of variance in sell-through rates</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">0.32</div>
+                <div class="metric-label">RMSE</div>
+                <div class="metric-desc">Typical prediction within 32 percentage points</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">0.18</div>
+                <div class="metric-label">MAE</div>
+                <div class="metric-desc">Average prediction error of 18 percentage points</div>
+            </div>
+        </div>
+
+        <div class="comparison-section fade-in">
+            <h3 style="font-family: 'Press Start 2P', cursive; font-size: 0.8rem; color: var(--maws-gold); margin-bottom: 20px; text-align: center;">
+                RUN 1 vs RUN 2 COMPARISON
+            </h3>
+            <div class="comparison-header">
+                <span>METRIC</span>
+                <span>RUN 1 (36)</span>
+                <span>RUN 2 (9)</span>
+                <span>IMPROVEMENT</span>
+            </div>
+            <div class="comparison-row">
+                <span class="metric-name">R² (variance explained)</span>
+                <span class="run1">0.4763</span>
+                <span class="run2">0.2644</span>
+                <span class="improvement">+80%</span>
+            </div>
+            <div class="comparison-row">
+                <span class="metric-name">RMSE</span>
+                <span class="run1">0.3231</span>
+                <span class="run2">0.3829</span>
+                <span class="improvement">-15.6%</span>
+            </div>
+            <div class="comparison-row">
+                <span class="metric-name">MAE</span>
+                <span class="run1">0.1801</span>
+                <span class="run2">0.3460</span>
+                <span class="improvement">-47.9%</span>
+            </div>
+            <div class="comparison-row">
+                <span class="metric-name">Number of Features</span>
+                <span class="run1">36</span>
+                <span class="run2">9</span>
+                <span class="improvement">4x more</span>
+            </div>
+        </div>
+
+        <div class="strengths-grid fade-in">
+            <div class="strength-box">
+                <h3 class="box-title">[+] STRENGTHS</h3>
+                <ul class="box-list">
+                    <li>Good predictive power with R² of 0.4763</li>
+                    <li>Effective handling of most UFC events</li>
+                    <li>Proper time-based train/test split prevents data leakage</li>
+                    <li>Feature importance analysis highlights impactful predictors</li>
+                    <li>Comprehensive feature engineering with graph analytics</li>
+                    <li>Cross-validation for robust hyperparameter tuning</li>
+                </ul>
+            </div>
+            <div class="limitation-box">
+                <h3 class="box-title">[-] LIMITATIONS</h3>
+                <ul class="box-list">
+                    <li>Struggles with outlier events (very low sell-through)</li>
+                    <li>Attendance data coverage limited to 85.3%</li>
+                    <li>External factors not captured (marketing, injuries, cancellations)</li>
+                    <li>Higher error margins for rare/unusual events</li>
+                    <li>New "super events" introduced by Dana White not in training data</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Visualizations Section -->
+    <section class="section" id="visualizations">
+        <h2 class="section-title">Data Visualizations</h2>
+
+        <h3 style="font-family: 'Press Start 2P', cursive; font-size: 0.8rem; color: var(--phosphor-green); margin-bottom: 25px; text-align: center;">
+            EXPLORATORY DATA ANALYSIS
+        </h3>
+
+        <div class="viz-grid fade-in">
+            <div class="viz-card">
+                <img src="images/1_sellthrough_distribution.png" alt="Distribution of UFC Event Sell-Through Rates" class="viz-image" onclick="openModal(this)">
+                <p class="viz-title">Sell-Through Distribution</p>
+                <p class="viz-desc">Bimodal distribution with peaks at 0% and 70-80% sell-through rates</p>
+            </div>
+            <div class="viz-card">
+                <img src="images/2_sellthrough_over_time.png" alt="UFC Event Sell-Through Rates Over Time" class="viz-image" onclick="openModal(this)">
+                <p class="viz-title">Trends Over Time</p>
+                <p class="viz-desc">Individual events (blue) and yearly averages (red) showing temporal patterns</p>
+            </div>
+            <div class="viz-card">
+                <img src="images/3_sellthrough_by_event_type.png" alt="Sell-Through Rates by Event Type" class="viz-image" onclick="openModal(this)">
+                <p class="viz-title">By Event Type</p>
+                <p class="viz-desc">PPV and 'Other' events consistently outperform Fight Nights</p>
+            </div>
+            <div class="viz-card">
+                <img src="images/4_sellthrough_by_location.png" alt="Sell-Through Rates by Location" class="viz-image" onclick="openModal(this)">
+                <p class="viz-title">Vegas vs Other Venues</p>
+                <p class="viz-desc">Vegas shows higher variance with notable low sell-through outliers</p>
+            </div>
+            <div class="viz-card">
+                <img src="images/8_title_fight_impact.png" alt="Impact of Title Fights on Sell-Through Rates" class="viz-image" onclick="openModal(this)">
+                <p class="viz-title">Title Fight Impact</p>
+                <p class="viz-desc">Distribution of sell-through rates for events without title fights</p>
+            </div>
+        </div>
+
+        <h3 style="font-family: 'Press Start 2P', cursive; font-size: 0.8rem; color: var(--maws-gold); margin: 50px 0 25px; text-align: center;">
+            FEATURE ANALYSIS
+        </h3>
+
+        <div class="viz-card-large fade-in">
+            <img src="images/5_feature_importance.png" alt="Most Important Features for Sell-Through Prediction" class="viz-image" onclick="openModal(this)">
+            <p class="viz-title" style="text-align: center;">Feature Importance Rankings</p>
+            <p class="viz-desc" style="text-align: center;">Month, days_since_last, is_vegas, is_ppv, and day_of_week are the dominant predictors. Reddit signals have minimal impact.</p>
+        </div>
+
+        <div class="viz-card-large fade-in">
+            <img src="images/10_correlation_heatmap.png" alt="Correlation Heatmap" class="viz-image" onclick="openModal(this)">
+            <p class="viz-title" style="text-align: center;">Feature Correlation Heatmap</p>
+            <p class="viz-desc" style="text-align: center;">Top 15 features showing correlations with sell-through. Note strong negative correlation with is_vegas (-0.77).</p>
+        </div>
+
+        <h3 style="font-family: 'Press Start 2P', cursive; font-size: 0.8rem; color: var(--vhs-red); margin: 50px 0 25px; text-align: center;">
+            MODEL PERFORMANCE
+        </h3>
+
+        <div class="viz-grid fade-in">
+            <div class="viz-card">
+                <img src="images/6_actual_vs_predicted.png" alt="Actual vs Predicted Sell-Through Rates" class="viz-image" onclick="openModal(this)">
+                <p class="viz-title">Actual vs Predicted</p>
+                <p class="viz-desc">Points near the diagonal indicate accurate predictions; outliers visible at low actuals</p>
+            </div>
+            <div class="viz-card">
+                <img src="images/7_model_comparison.png" alt="Model Performance Comparison" class="viz-image" onclick="openModal(this)">
+                <p class="viz-title">Model Comparison</p>
+                <p class="viz-desc">R² comparison: Baseline (9 features) vs Improved (36 features)</p>
+            </div>
+            <div class="viz-card">
+                <img src="images/9_residuals.png" alt="Residuals Plot" class="viz-image" onclick="openModal(this)">
+                <p class="viz-title">Residuals Analysis</p>
+                <p class="viz-desc">Residuals show larger errors for high predicted values, indicating underprediction</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Challenges & Solutions -->
+    <section class="section" id="challenges">
+        <h2 class="section-title">Challenges & Solutions</h2>
+
+        <div class="challenge-grid">
+            <div class="challenge-card fade-in">
+                <div class="challenge-icon">[!]</div>
+                <h3 class="challenge-title">Missing Attendance Data</h3>
+                <p class="challenge-solution">Only 85% of events had attendance data. Solved by fuzzy matching event names and date validation (±1 day) to maximize coverage.</p>
+            </div>
+
+            <div class="challenge-card fade-in">
+                <div class="challenge-icon">[~]</div>
+                <h3 class="challenge-title">Name Matching Across Sources</h3>
+                <p class="challenge-solution">Event and fighter names varied across sources. Applied normalization (lowercase, special char removal) and fuzzy matching with date validation.</p>
+            </div>
+
+            <div class="challenge-card fade-in">
+                <div class="challenge-icon">[%]</div>
+                <h3 class="challenge-title">API Rate Limiting</h3>
+                <p class="challenge-solution">Google Trends, Reddit, and betting sites imposed strict rate limits. Implemented request delays, retry logic with exponential backoff, and batch processing.</p>
+            </div>
+
+            <div class="challenge-card fade-in">
+                <div class="challenge-icon">[#]</div>
+                <h3 class="challenge-title">Data Format Variations</h3>
+                <p class="challenge-solution">Handled inconsistent date and numeric formats across sources with robust parsing supporting multiple formats and currency symbols.</p>
+            </div>
+
+            <div class="challenge-card fade-in">
+                <div class="challenge-icon">[?]</div>
+                <h3 class="challenge-title">Historical Data Availability</h3>
+                <p class="challenge-solution">External data like betting odds and social sentiment only available from 2010 onward. Adjusted analysis to account for limited features in older events.</p>
+            </div>
+
+            <div class="challenge-card fade-in">
+                <div class="challenge-icon">[&]</div>
+                <h3 class="challenge-title">Feature Engineering Complexity</h3>
+                <p class="challenge-solution">Calculating rolling statistics for 4,400+ fighters over 8,400+ fights required scalable solutions. Leveraged PySpark window functions for distributed computation.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Card Optimizer Demo -->
+    <section class="section" id="optimizer">
+        <h2 class="section-title">Card Optimizer Demo</h2>
+
+        <div class="optimizer-demo fade-in">
+            <div class="optimizer-header">
+                <div class="optimizer-stat">
+                    <div class="optimizer-stat-value">100%</div>
+                    <div class="optimizer-stat-label">Predicted Sell-Through</div>
+                </div>
+                <div class="optimizer-stat">
+                    <div class="optimizer-stat-value">14</div>
+                    <div class="optimizer-stat-label">Total Fights</div>
+                </div>
+                <div class="optimizer-stat">
+                    <div class="optimizer-stat-value">3</div>
+                    <div class="optimizer-stat-label">Title Fights</div>
+                </div>
+                <div class="optimizer-stat">
+                    <div class="optimizer-stat-value">20,000</div>
+                    <div class="optimizer-stat-label">Attendance</div>
+                </div>
+            </div>
+
+            <h3 style="font-family: 'Press Start 2P', cursive; font-size: 0.8rem; color: var(--phosphor-green); margin-bottom: 20px;">
+                TOP 5 SELECTED FIGHTS
+            </h3>
+
+            <ul class="fight-list">
+                <li class="fight-item">
+                    <span class="fight-rank">1</span>
+                    <div class="fight-details">
+                        <p class="fight-matchup">Islam Makhachev vs Charles Oliveira</p>
+                        <p class="fight-meta">Lightweight Title Fight</p>
+                    </div>
+                    <span class="fight-score">Score: 1.353</span>
+                </li>
+                <li class="fight-item">
+                    <span class="fight-rank">2</span>
+                    <div class="fight-details">
+                        <p class="fight-matchup">Jon Jones vs Stipe Miocic</p>
+                        <p class="fight-meta">Heavyweight Title Fight</p>
+                    </div>
+                    <span class="fight-score">Score: 1.331</span>
+                </li>
+                <li class="fight-item">
+                    <span class="fight-rank">3</span>
+                    <div class="fight-details">
+                        <p class="fight-matchup">Sean O'Malley vs Merab Dvalishvili</p>
+                        <p class="fight-meta">Bantamweight Title Fight</p>
+                    </div>
+                    <span class="fight-score">Score: 1.248</span>
+                </li>
+                <li class="fight-item">
+                    <span class="fight-rank">4</span>
+                    <div class="fight-details">
+                        <p class="fight-matchup">Max Holloway vs Ilia Topuria</p>
+                        <p class="fight-meta">Featherweight</p>
+                    </div>
+                    <span class="fight-score">Score: 0.990</span>
+                </li>
+                <li class="fight-item">
+                    <span class="fight-rank">5</span>
+                    <div class="fight-details">
+                        <p class="fight-matchup">Alex Pereira vs Jamahal Hill</p>
+                        <p class="fight-meta">Light Heavyweight</p>
+                    </div>
+                    <span class="fight-score">Score: 0.967</span>
+                </li>
+            </ul>
+
+            <div style="margin-top: 30px; padding: 20px; background: rgba(0,0,0,0.3); border-radius: 10px;">
+                <h4 style="font-family: 'Press Start 2P', cursive; font-size: 0.6rem; color: var(--maws-gold); margin-bottom: 15px;">ALGORITHM OVERVIEW</h4>
+                <p style="color: #ccc; font-size: 1.2rem; line-height: 1.8;">
+                    Uses trained sell-through prediction model for fight card selection. Employs a <span class="highlight">greedy algorithm with 2-opt improvement</span> for optimization. Considers fight importance, titles, weight classes, and fan appeal. Covers <span class="highlight-green">10 different weight classes</span> for diversity.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Learnings -->
+    <section class="section" id="learnings">
+        <h2 class="section-title">Key Learnings</h2>
+
+        <div class="learnings-grid">
+            <div class="learning-box fade-in">
+                <h3 class="learning-title">[>] Technical Skills Developed</h3>
+                <ul class="learning-list">
+                    <li>PySpark for big data processing and distributed computing</li>
+                    <li>Window functions for rolling statistics and time-series features</li>
+                    <li>GraphFrames for network analysis and fighter importance metrics</li>
+                    <li>External data integration via web scraping and APIs with rate limiting</li>
+                    <li>ML model tuning using Spark MLlib's GBT regressor</li>
+                </ul>
+            </div>
+
+            <div class="learning-box fade-in">
+                <h3 class="learning-title">[*] Insights Gained</h3>
+                <ul class="learning-list">
+                    <li>Comprehensive feature engineering improved model R² by 80%</li>
+                    <li>External data (betting, Trends, Reddit) add predictive value</li>
+                    <li>Graph analytics reveal fighter 'star power' beyond traditional stats</li>
+                    <li>Time-based validation is critical for realistic evaluation</li>
+                    <li>Automated pipelines enable scalable, repeatable workflows</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="crt-card fade-in" style="margin-top: 40px;">
+            <div class="crt-screen">
+                <div class="crt-content">
+                    <h3 class="crt-title">FUTURE IMPROVEMENTS</h3>
+                    <p class="crt-text">
+                        <span class="highlight">Short-term:</span><br>
+                        > Integrate live betting odds API for real-time updates<br>
+                        > Incorporate more social media metrics (Twitter, Instagram)<br>
+                        > Predict fighter injury close to fight<br><br>
+                        <span class="highlight">Long-term:</span><br>
+                        > Develop streaming pipeline for live sell-through predictions<br>
+                        > Create interactive web dashboard for event planners<br>
+                        > Enable what-if scenario analysis for card composition<br>
+                        > Expand to PPV buy rates and gate revenue predictions
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <h2 class="footer-title">THANK YOU</h2>
+        
+        <div class="footer-links">
+            <a href="https://github.com/Maws7140" target="_blank" class="footer-link">GitHub</a>
+            <a href="https://www.linkedin.com/in/oluwaferanmi-wale-bogunjoko-72160b2bb/" target="_blank" class="footer-link">LinkedIn</a>
+        </div>
+
+        <div class="footer-credits">
+            <p>DS/CMPSC 410 • Fall 2025 • Penn State University</p>
+            <p style="margin-top: 10px;">
+                Data Sources: 
+                <a href="https://github.com/Greco1899/scrape_ufc_stats" target="_blank">UFCStats</a> • 
+                BestFightOdds.com • 
+                <a href="https://spark.apache.org/docs/latest/ml-guide.html" target="_blank">Spark MLlib</a>
+            </p>
+            <p style="margin-top: 20px; color: var(--maws-purple);">
+                <- <a href="https://maws.is-a.dev/" style="color: var(--maws-purple);">Back to Portfolio</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Image Modal -->
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <span class="modal-close">X</span>
+        <img id="modalImage" src="" alt="Full size visualization">
+    </div>
+
+    <!-- Back to Portfolio Button -->
+    <a href="https://maws.is-a.dev/" class="back-btn" title="Back to Portfolio"><- PORTFOLIO</a>
+
+    <script>
+        // Image modal functions
+        function openModal(img) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            modal.style.display = 'block';
+            modalImg.src = img.src;
+            modalImg.alt = img.alt;
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+        // Scroll animation
+        const fadeElements = document.querySelectorAll('.fade-in');
+        
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        fadeElements.forEach(el => observer.observe(el));
+
+        // Smooth scroll for nav links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add subtle glitch effect on hover for CRT cards
+        document.querySelectorAll('.crt-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateX(2px)';
+                setTimeout(() => {
+                    card.style.transform = 'translateX(-2px)';
+                    setTimeout(() => {
+                        card.style.transform = 'translateX(0)';
+                    }, 50);
+                }, 50);
+            });
+        });
+    </script>
+</body>
+</html>

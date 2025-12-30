@@ -48,6 +48,13 @@ env/
 .idea/
 *.swp
 *.swo
+.cursor/
+.cursorignore
+.cursorindexingignore
+
+# Claude
+.claude/
+CLAUDE.md
 
 # Jupyter Notebook
 .ipynb_checkpoints/
